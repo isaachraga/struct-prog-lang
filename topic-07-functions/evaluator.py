@@ -20,6 +20,9 @@ def evaluate(ast, environment={}):
         print(s)
         printed_string = s
         return None
+    if ast["tag"] == "ihraga":
+        environment["_kentid_"] = "ihraga@kent.edu"
+        return None
     if ast["tag"] == "if":
         condition_value = evaluate(ast["condition"], environment)
         if condition_value:
@@ -202,6 +205,12 @@ def test_evaluate_print():
     assert eval("print 3.14") == None    
     assert printed_string == "3.14"
 
+def test_evaluate_ihraga():
+    print("testing evaluate ihraga")
+    env = {}
+    assert eval("ihraga", env) == None 
+    assert env["_kentid_"] == "ihraga@kent.edu"
+
 def test_evaluate_assignment():
     print("testing evaluate assignment")
     env = {"x":4,"y":5}
@@ -232,6 +241,7 @@ if __name__ == "__main__":
     test_evaluate_division()
     test_evaluate_expression()
     test_evaluate_print()
+    test_evaluate_ihraga()
     test_evaluate_identifier()
     test_if_statement()
     test_while_statement()

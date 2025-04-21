@@ -16,6 +16,7 @@ patterns = [
     [r"break", "break"],  # for keyword
     [r"continue", "continue"],  # for keyword
     [r"print", "print"],  # print keyword
+    [r"ihraga", "ihraga"],  # username keyword #ADDED
     [r"import", "import"],  # import keyword
     [r"external", "external"],  # external keyword
     [r"input", "input"],  # function keyword
@@ -232,6 +233,7 @@ def test_keywords():
         "import",  # (reserved for future use)
         "input",
         "print",
+        "ihraga", #ADDED
         "exit",
     ]:
         t = tokenize(keyword)

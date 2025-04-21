@@ -27,8 +27,9 @@ grammar = """
     if_statement = "if" "(" expression ")" statement_block [ "else" statement_block ]
     while_statement = "while" "(" expression ")" statement_block
     statement = statement_block | if_statement | while_statement | print_statement | assignment_statement
-    function_statement = "function" identifier identifier_list statement_block
+    function_statement = "function" identifier "(" [ identifier { "," identifier } ] ")" statement_list
     program = [ statement { ";" statement } ]
+    ihraga_statement = "ihraga" 
 """
 
 # --- Parsing Functions and Their Tests ---
@@ -343,6 +344,59 @@ def test_parse_logical_expression():
         },
     }
 
+def parse_assignment_expression(tokens):
+    """
+    assignment_expression = logical_expression [ "=" assignment_expression ]
+    """
+    left, tokens = parse_logical_expression(tokens)
+    if tokens[0]["tag"] == "=":
+        tokens = tokens[1:]
+        right, tokens = parse_assignment_expression(tokens)
+        return {"tag": "assign", "target": left, "value": right}, tokens
+    return left, tokens
+
+def test_parse_assignment_expression():
+    """
+    assignment_expression = logical_expression [ "=" assignment_expression ]
+    """
+    print("testing parse_assignment_expression...")
+
+    # Simple value
+    ast, tokens = parse_assignment_expression(tokenize("x"))
+    assert ast == {"tag": "identifier", "value": "x"}
+
+    # Basic assignment
+    ast, tokens = parse_assignment_expression(tokenize("x = 3"))
+    assert ast == {
+        "tag": "assign",
+        "target": {"tag": "identifier", "value": "x"},
+        "value": {"tag": "number", "value": 3},
+    }
+
+    # Nested assignment
+    ast, tokens = parse_assignment_expression(tokenize("x = y = 4"))
+    assert ast == {
+        "tag": "assign",
+        "target": {"tag": "identifier", "value": "x"},
+        "value": {
+            "tag": "assign",
+            "target": {"tag": "identifier", "value": "y"},
+            "value": {"tag": "number", "value": 4},
+        },
+    }
+
+    # Assignment with expression on RHS
+    ast, tokens = parse_assignment_expression(tokenize("x = y + 1"))
+    assert ast == {
+        "tag": "assign",
+        "target": {"tag": "identifier", "value": "x"},
+        "value": {
+            "tag": "+",
+            "left": {"tag": "identifier", "value": "y"},
+            "right": {"tag": "number", "value": 1},
+        },
+    }
+
 def parse_expression(tokens):
     """
     expression = logical_expression
@@ -647,28 +701,36 @@ def test_parse_assignment_statement():
     ast, tokens = parse_assignment_statement(tokenize("2"))
     assert ast == {"tag": "number", "value": 2}
 
+#ihraga
 def parse_function_statement(tokens):
     """
-    function_statement = "function" identifier identifier_list statement_block
+    function_statement = "function" identifier "(" [ identifier { "," identifier } ] ")" statement_list
     """
-    function_token = tokens[0]
-    identifier_token = tokens[1]
-    assignment_token = {'tag': '=', 'position': identifier_token["position"], 'value': '='}
-    tokens = [identifier_token, assignment_token, function_token ] + tokens[2:]
-    return parse_function_literal(tokens)
+    assert tokens[0]["tag"] == "function"
+    tokens = tokens[1:]
+    assert tokens[0]["tag"] == "identifier"
+    identifier_token = tokens[0]
+    tokens = tokens[1:]
+    tokens = [
+        identifier_token,
+        {"tag": "=", "value": "="},
+        {"tag": "function", "value": "function"},
+    ] + tokens
+    return parse_assignment_expression(tokens)
 
 def test_parse_function_statement():
     """
-    function_statement = "function" identifier identifier_list statement_block
+    function_statement = "function" identifier "(" [ identifier { "," identifier } ] ")" statement_list
     """
     # tokens = tokenize("foo = function (x) {}")
     # ast1, _ = parse(tokens)
     tokens = tokenize("function foo(x) {}")
     ast2, _ = parse_function_statement(tokens)
     # print(ast1)
-    print(ast2)
-    exit(0)
-
+    #print(ast2)
+    print("testing parse_function_statement...")
+    assert ast2 == {'tag': 'assign', 'target': {'tag': 'identifier', 'value': 'foo'}, 'value': {'tag': 'function', 'parameters': {'tag': 'identifier_list', 'identifiers': [{'tag': 'identifier', 'value': 'x'}]}, 'statements': {'tag': 'block', 'statements': []}}}
+    
 
 def parse_statement(tokens):
     """
@@ -685,6 +747,8 @@ def parse_statement(tokens):
         return parse_print_statement(tokens)
     if tag == "function":
         return parse_function_statement(tokens)
+    if tag == "ihraga":
+        return parse_ihraga_statement(tokens)
     return parse_assignment_statement(tokens)
 
 def test_parse_statement():
@@ -728,6 +792,22 @@ def test_parse_program():
         ],
     }
 
+def parse_ihraga_statement(tokens):
+    """
+    ihraga_statement = "ihraga"
+    """
+    assert tokens[0]["tag"] == "ihraga"
+    tokens = tokens[1:]
+    return {"tag": "ihraga"}, tokens
+
+def test_parse_ihraga_statement():
+    """
+    ihraga_statement = "ihraga" 
+    """
+    print("testing parse_ihraga_statement...")
+    ast = parse_ihraga_statement(tokenize("ihraga"))[0]
+    assert ast == {'tag': 'ihraga'}
+
 def parse(tokens):
     ast, tokens = parse_program(tokens)
     return ast
@@ -759,6 +839,7 @@ if __name__ == "__main__":
         test_parse_function_statement,
         test_parse_statement,
         test_parse_program,
+        test_parse_ihraga_statement,
     ]
 
     untested_grammar = normalized_grammar

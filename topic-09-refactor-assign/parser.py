@@ -2,7 +2,7 @@ from tokenizer import tokenize
 from pprint import pprint
 
 # NOTE - ADD simple-expression = ... "(" expression ")"
-
+#NEED TO ADD TO GRAMMAR
 grammar = """
     simple_expression = identifier | <boolean> | <number> | <string> | list_literal | object_literal | ("-" simple_expression) | ("!" simple_expression) | function_literal | ( "(" expression ")" )
 
@@ -35,6 +35,7 @@ grammar = """
     import_statement = "import" expression
     break_statement = "break"
     continue_statement = "continue"
+    ihraga_statement = "ihraga" 
 
     statement = if_statement | while_statement | function_statement | return_statement | print_statement | exit_statement | import_statement | break_statement | continue_statement | assert_statement | expression
 
@@ -1063,6 +1064,7 @@ def parse_break_statement(tokens):
     return {"tag": "break"}, tokens
 
 
+
 def test_parse_break_statement():
     """
     break_statement = "break"
@@ -1130,6 +1132,16 @@ def test_parse_assert_statement():
     ast = parse_assert_statement(tokenize("assert 1,2"))[0]
     assert ast == {"tag": "assert", "condition": {"tag": "number", "value": 1},"explanation": {"tag": "number", "value": 2}}
 
+def parse_ihraga_statement(tokens):
+
+    
+def test_parse_ihraga_statement():
+    """
+    ihraga_statement = "ihraga" 
+    """
+    print("testing parse_import_statement...")
+    ast = parse_ihraga_statement(tokenize("ihraga"))[0]
+    assert ast == {'tag': 'ihraga'}
 
 def test_parse_function_statement():
     """
@@ -1177,6 +1189,8 @@ def parse_statement(tokens):
         return parse_continue_statement(tokens)
     if tag == "assert":
         return parse_assert_statement(tokens)
+    if tag == "ihraga":
+        return parse_ihraga_statement(tokens)
     return parse_expression(tokens)
 
 
@@ -1335,6 +1349,7 @@ if __name__ == "__main__":
         test_parse_continue_statement,
         test_parse_import_statement,
         test_parse_assert_statement,
+        test_parse_ihraga_statement,
         test_parse_statement,
         test_parse_program,
     ]

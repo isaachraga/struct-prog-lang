@@ -3,6 +3,7 @@ import re
 # Define patterns for tokens
 patterns = [
     [r"print","print"],
+    [r"ihraga", "ihraga"],  # username keyword #ADDED
     [r"if","if"],
     [r"else","else"],
     [r"while","while"],
@@ -122,7 +123,7 @@ def test_whitespace():
 def test_keywords():
     print("test keywords...")
     for keyword in [
-        "print","if","else","while","continue","break","return","assert","function"
+        "print","if","else","while","continue","break","return","assert","function","ihraga"
     ]:
         t = tokenize(keyword)
         assert len(t) == 2
@@ -155,3 +156,4 @@ if __name__ == "__main__":
     test_keywords()
     test_identifier_tokens()
     test_error()
+    print("done.")
