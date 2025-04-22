@@ -26,10 +26,11 @@ grammar = """
     print_statement = "print" [ expression ]
     if_statement = "if" "(" expression ")" statement_block [ "else" statement_block ]
     while_statement = "while" "(" expression ")" statement_block
-    statement = statement_block | if_statement | while_statement | print_statement | assignment_statement
+    ihraga_statement = "ihraga"
+    statement = statement_block | if_statement | while_statement | print_statement | assignment_statement | ihraga_statement
     function_statement = "function" identifier "(" [ identifier { "," identifier } ] ")" statement_list
     program = [ statement { ";" statement } ]
-    ihraga_statement = "ihraga" 
+    
 """
 
 # --- Parsing Functions and Their Tests ---
@@ -734,7 +735,7 @@ def test_parse_function_statement():
 
 def parse_statement(tokens):
     """
-    statement = statement_block | if_statement | while_statement | print_statement | assignment_statement
+    statement = statement_block | if_statement | while_statement | print_statement | assignment_statement | ihraga_statement
     """
     tag = tokens[0]["tag"]
     if tag == "{":
@@ -753,7 +754,7 @@ def parse_statement(tokens):
 
 def test_parse_statement():
     """
-    statement = statement_block | if_statement | while_statement | print_statement | assignment_statement
+    statement = statement_block | if_statement | while_statement | print_statement | assignment_statement | ihraga_statement
     """
     print("testing parse_statement...")
     ast, _ = parse_statement(tokenize("{print 1}"))
@@ -784,6 +785,7 @@ def test_parse_program():
     """
     print("testing parse_program...")
     ast, tokens = parse_program(tokenize("print 1; print 2"))
+    #print(ast)
     assert ast == {
         "tag": "program",
         "statements": [
@@ -798,14 +800,17 @@ def parse_ihraga_statement(tokens):
     """
     assert tokens[0]["tag"] == "ihraga"
     tokens = tokens[1:]
+    assert tokens[0]["tag"] in [";", None]
     return {"tag": "ihraga"}, tokens
+
 
 def test_parse_ihraga_statement():
     """
     ihraga_statement = "ihraga" 
     """
     print("testing parse_ihraga_statement...")
-    ast = parse_ihraga_statement(tokenize("ihraga"))[0]
+    ast = parse_ihraga_statement(tokenize("ihraga;"))[0]
+    print(ast)
     assert ast == {'tag': 'ihraga'}
 
 def parse(tokens):
