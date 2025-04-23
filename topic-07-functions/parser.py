@@ -11,7 +11,7 @@ Parser for simple expressions and statements.
 
 grammar = """
     factor = <number> | <identifier> | "(" expression ")" | "!" expression | "-" expression | function_literal
-    term = factor { "*"|"/" factor }
+    term = factor { "*"|"/"|"%" factor }
     arithmetic_expression = term { "+"|"-" term }
     relational_expression = arithmetic_expression { ("<" | ">" | "<=" | ">=" | "==" | "!=") arithmetic_expression }
     logical_factor = relational_expression
@@ -112,10 +112,10 @@ def test_parse_factor():
 
 def parse_term(tokens):
     """
-    term = factor { "*"|"/" factor }
+    term = factor { "*"|"/"|"%" factor }
     """
     node, tokens = parse_factor(tokens)
-    while tokens[0]["tag"] in ["*", "/"]:
+    while tokens[0]["tag"] in ["*", "/", "%"]:
         tag = tokens[0]["tag"]
         right_node, tokens = parse_factor(tokens[1:])
         node = {"tag": tag, "left": node, "right": right_node}
@@ -123,7 +123,7 @@ def parse_term(tokens):
 
 def test_parse_term():
     """
-    term = factor { "*"|"/" factor }
+    term = factor { "*"|"/"|"%" factor }
     """
     print("testing parse_term()")
     for s in ["1", "22", "333"]:

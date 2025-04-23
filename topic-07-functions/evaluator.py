@@ -53,7 +53,7 @@ def evaluate(ast, environment={}):
             if ast["value"] in parent_environment:
                 return parent_environment[ast["value"]]
         raise Exception(f"Value [{ast["value"]}] not found in environment {environment}.")
-    if ast["tag"] in ["+", "-", "*", "/"]:
+    if ast["tag"] in ["+", "-", "*", "/", "%"]:
         left_value = evaluate(ast["left"], environment)
         right_value = evaluate(ast["right"], environment)
         if ast["tag"] == "+":
@@ -64,6 +64,8 @@ def evaluate(ast, environment={}):
             return left_value * right_value
         if ast["tag"] == "/":
             return left_value / right_value
+        if ast["tag"] == "%":
+            return left_value % right_value
     if ast["tag"] == "negate":
         value = evaluate(ast["value"], environment)
         return -value
@@ -143,6 +145,15 @@ def test_evaluate_division():
         "right":{"tag":"number","value":2}
         }
     assert evaluate(ast) == 2
+
+def test_evaluate_modulus():
+    print("testing evaluate modulus")
+    ast = {
+        "tag":"%",
+        "left":{"tag":"number","value":4},
+        "right":{"tag":"number","value":2}
+        }
+    assert evaluate(ast) == 0
 
 def eval(s, environment={}):
     tokens = tokenize(s)
@@ -239,6 +250,7 @@ if __name__ == "__main__":
     test_evaluate_subtraction()
     test_evaluate_multiplication()
     test_evaluate_division()
+    test_evaluate_modulus()
     test_evaluate_expression()
     test_evaluate_print()
     test_evaluate_ihraga()

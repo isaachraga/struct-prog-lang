@@ -21,6 +21,7 @@ patterns = [
     [r"\-", "-"],
     [r"\*", "*"],
     [r"\/", "/"],
+    [r"\%", "%"],
     [r"\(", "("],
     [r"\)", ")"],
     [r"==", "=="],
@@ -82,7 +83,7 @@ def tokenize(characters):
 
 def test_simple_token():
     print("test simple token")
-    examples = "+-*/()=;<>{}[].,"
+    examples = "+-*/%()=;<>{}[].,"
     for example in examples:
         print(example)
         t = tokenize(example)[0]
