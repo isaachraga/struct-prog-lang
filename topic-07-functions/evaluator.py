@@ -44,7 +44,7 @@ def evaluate(ast, environment={}):
         environment[identifier] = value
         return value, environment
     if ast["tag"] == "number":
-        return ast["value"]
+        return ast["value"], environment
     if ast["tag"] == "identifier":
         if ast["value"] in environment:
             return environment[ast["value"]]
@@ -58,15 +58,15 @@ def evaluate(ast, environment={}):
         left_value = evaluate(ast["left"], environment)
         right_value = evaluate(ast["right"], environment)
         if ast["tag"] == "+":
-            return left_value + right_value
+            return left_value + right_value, environment
         if ast["tag"] == "-":
-            return left_value - right_value
+            return left_value - right_value, environment
         if ast["tag"] == "*":
-            return left_value * right_value
+            return left_value * right_value, environment
         if ast["tag"] == "/":
-            return left_value / right_value
+            return left_value / right_value, environment
         if ast["tag"] == "%":
-            return left_value % right_value
+            return left_value % right_value, environment
     if ast["tag"] == "negate":
         value = evaluate(ast["value"], environment)
         return -value
