@@ -19,7 +19,7 @@ def evaluate(ast, environment={}):
         s = str(value)
         print(s)
         printed_string = s
-        return None
+        return printed_string, environment
     if ast["tag"] == "ihraga":
         environment["_kentid_"] = "ihraga@kent.edu"
         return None
@@ -42,6 +42,7 @@ def evaluate(ast, environment={}):
         assert type(identifier) is str
         value = evaluate(ast["value"],environment)
         environment[identifier] = value
+        return value, environment
     if ast["tag"] == "number":
         return ast["value"]
     if ast["tag"] == "identifier":

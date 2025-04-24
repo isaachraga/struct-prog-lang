@@ -6,12 +6,17 @@ import sys
 def run(text):
     tokens = tokenizer.tokenize(text)
     ast = parser.parse(tokens)
-    evaluator.evaluate(ast)
+    return evaluator.evaluate(ast)
 
 def repl():
+    env = {}
+    lastValue = None
     print("Welcome to your sopl REPL!\n")
-    print("Available commands: info, exit/quit\n")
-
+    print("Available commands:\n")
+    print("info --------------- additional information\n")
+    print("dir ---------------- print environment\n")
+    print("_ ------------------ result of last expression\n")
+    print("exit/quit ---------- terminate session\n")
     while True:
         try:
             line = input(">>>> ")
@@ -20,9 +25,18 @@ def repl():
                 break
             if line.strip() in {"info"}:
                 print("Uses the synax of our in-class language\n")
-                print("Need to figure out multiline\n")
                 continue;
-            run(line)
+            if line.strip() in {"dir"}:
+                print(env)
+                continue;
+            if line.strip() in {"_"}:
+                print(lastValue)
+                line = ""
+                continue;
+            if '_' in line.strip() :
+                line = line.replace("_", lastValue)
+                print(line)
+            lastValue, env = run(line)
         except Exception as e:
             print("Error:", e)
 
